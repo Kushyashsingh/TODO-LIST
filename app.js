@@ -27,7 +27,7 @@ const ToDoSchema =new mongoose.Schema({
 
 
 // This route should fetch tasks of a particular category and query, It should fetch all tasks if priority or category is not provided.
-app.get("/tasks/:category&priority",function(req,res){
+app.get("/tasks",function(req,res){
     ToDo.findOne(
         {
         catergory:req.params.category,
@@ -85,7 +85,7 @@ app.delete("/tasks",function(req,res){
 })
 
 //This route should fetch record of a particular task
-app.get("/task/:name", function(req, res){
+app.get("/task/:task_id", function(req, res){
    ToDo.findOne({name: req.params.name},function(err, foundToDo){
           if (foundToDo) {
               res.send(foundToDo)
@@ -96,8 +96,8 @@ app.get("/task/:name", function(req, res){
     })
 
 //This route should replace a task record with another task record.
-app.put("/task/:name",function(req,res){
-    ToDo.update(
+app.put("/task/:task_id",function(req,res){
+    ToDo.updateMany(
         {
          task_id: req.params.task_id,
          name: req.params.name,
@@ -118,7 +118,10 @@ app.put("/task/:name",function(req,res){
 
 })    
   //This route should update some fields of a task record.
-app.patch("/task:name",function (req, res){
+  app.patch("/task/:task_id", function (req, res){
+    const task_id = req.params.task_id;
+    const task = ToDo.findOne({ task_id: task_id });
+    const name = req.body.name || task.name;
     ToDo.update(
         {
          task_id: req.params.task_id,
@@ -127,34 +130,29 @@ app.patch("/task:name",function (req, res){
          category: req.params.category,
          priority: req.params.priority,
         },
-        {$set: req.body}, 
+        {$set: req.body},
         function(err){
             if(!err){
-                res.send("Updated successfully")
+                res.send("Successfully Updated")
             }
             else{
                 res.send(err)
             }
         }
     )
-  });
+       
+    })
 
 //This route should delete a task.
-app.delete("/task:name",function(req,res){
-    ToDo.deleteOne(
-        {name: req.params.name },
-        function(err)
-        {
-            if(!err){
-                res.send("succesfully deleted task")
-            }
-            else
-            {
-                res.send(err);
-            }
-        }
-    )
-})
+app.delete("/task/:task_id", function (req, res) {
+  ToDo.deleteOne({ name: req.params.task_id }, function (err) {
+    if (!err) {
+      res.send("succesfully deleted task");
+    } else {
+      res.send(err);
+    }
+  });
+});
 
 app.listen(9000,function()
 {
