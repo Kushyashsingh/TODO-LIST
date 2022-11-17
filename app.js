@@ -86,7 +86,7 @@ app.delete("/tasks",function(req,res){
 
 //This route should fetch record of a particular task
 app.get("/task/:task_id", function(req, res){
-   ToDo.findOne({name: req.params.name},function(err, foundToDo){
+   ToDo.findOne({task_id: req.params.task_id},function(err, foundToDo){
           if (foundToDo) {
               res.send(foundToDo)
           } else {
